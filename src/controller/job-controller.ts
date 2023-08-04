@@ -1,5 +1,5 @@
 import { StatusCodes } from "http-status-codes";
-import { createJob, getAllJob, getJob } from "../service/job-service";
+import { createJob, getAllJob, getJob, updateJob } from "../service/job-service";
 import { Request, Response } from "express";
 import { NotFoundError } from "../errors/index";
 
@@ -30,6 +30,19 @@ export const getJobHandler = async (req: Request, res: Response) => {
     const id = req.user?.id;
 
     const job = await getJob({ _id: jobId, createdBy: id });
+
+    if (!job) {
+        throw new NotFoundError(`No job with the id ${jobId}`);
+    }
+
+    res.status(StatusCodes.OK).json({ job });
+};
+
+export const updateJobHandler = async (req: Request, res: Response) => {
+    const { body: { company, position }, params: { id: jobId } } = req;
+    const id = req.user?.id;
+
+    const job = await updateJob({ _id: jobId, createdBy: id }, { company, position });
 
     if (!job) {
         throw new NotFoundError(`No job with the id ${jobId}`);
