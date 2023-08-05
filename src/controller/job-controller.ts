@@ -1,5 +1,5 @@
 import { StatusCodes } from "http-status-codes";
-import { createJob, getAllJob, getJob, updateJob } from "../service/job-service";
+import { createJob, deleteJob, getAllJob, getJob, updateJob } from "../service/job-service";
 import { Request, Response } from "express";
 import { NotFoundError } from "../errors/index";
 
@@ -49,4 +49,17 @@ export const updateJobHandler = async (req: Request, res: Response) => {
     }
 
     res.status(StatusCodes.OK).json({ job });
+};
+
+export const deleteJobHandler = async (req: Request, res: Response) => {
+    const { params: { id: jobId } } = req;
+    const id = req.user?.id;
+
+    const job = await deleteJob({ _id: jobId, createdBy: id });
+
+    if (!job) {
+        throw new NotFoundError(`No job with the id ${jobId}`);
+    }
+
+    res.status(StatusCodes.OK).json("Job deleted successfully");
 };
