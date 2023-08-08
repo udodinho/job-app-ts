@@ -37,3 +37,19 @@ export const getJob = async (jobId: job) => {
     return job;
 
 };
+
+export const updateJob = async (jobId: job, payload: input) => {
+
+    const updatedJob = Job.findByIdAndUpdate(jobId, payload,  {new: true, runValidators: true});
+
+    return updatedJob;
+
+};
+
+export const deleteJob = async (jobId: job) => {
+    
+    const job = Job.findByIdAndDelete(jobId);
+    
+    return job;
+
+};
