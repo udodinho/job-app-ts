@@ -39,10 +39,10 @@ export const getJobHandler = async (req: Request, res: Response) => {
 };
 
 export const updateJobHandler = async (req: Request, res: Response) => {
-    const { body: { company, position }, params: { id: jobId } } = req;
+    const { body: { company, position, status }, params: { id: jobId } } = req;
     const id = req.user?.id;
 
-    const job = await updateJob({ _id: jobId, createdBy: id }, { company, position });
+    const job = await updateJob({ _id: jobId, createdBy: id }, { company, position, status });
 
     if (!job) {
         throw new NotFoundError(`No job with the id ${jobId}`);
