@@ -12,6 +12,7 @@ type job = {
 type input = {
     company?: string;
     position?: string;
+    status?: string;
 }
 
 export const createJob = async (input: JobDocument) => {
