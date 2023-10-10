@@ -1,7 +1,8 @@
 import { StatusCodes } from "http-status-codes";
 import { createJob, deleteJob, getAllJob, getJob, updateJob } from "../service/job-service";
 import { Request, Response } from "express";
-import { NotFoundError } from "../errors/index";
+import { BadRequestError, NotFoundError, UnauthenticatedError } from "../errors/index";
+import mongoose from "mongoose";
 
 export const createJobHandler = async (req: Request, res: Response) => {
 
@@ -27,9 +28,20 @@ export const getAllJobsHandler = async (req: Request, res: Response) => {
 
 export const getJobHandler = async (req: Request, res: Response) => {
     const { params: { id: jobId } } = req;
+
+    const isValidID = mongoose.isValidObjectId(jobId)
+
+    if (!isValidID) {
+        throw new BadRequestError("Please enter a correct id");
+    }
+    
     const id = req.user?.id;
 
     const job = await getJob({ _id: jobId, createdBy: id });
+    
+    if (id != job?.createdBy) {
+        throw new UnauthenticatedError("Unauthorized")
+    }
 
     if (!job) {
         throw new NotFoundError(`No job with the id ${jobId}`);
