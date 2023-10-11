@@ -33,7 +33,7 @@ export const getAllJob = async (createdBy: AllJob) => {
 
 export const getJob = async (jobId: job) => {
     
-    const job = Job.find(jobId);
+    const job = Job.findById(jobId);
 
     return job;
 
