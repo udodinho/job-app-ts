@@ -34,14 +34,11 @@ export const getJobHandler = async (req: Request, res: Response) => {
     if (!isValidID) {
         throw new BadRequestError("Please enter a correct id");
     }
+
+    const id = req.user?.id as string;
     
-    const id = req.user?.id;
 
     const job = await getJob({ _id: jobId, createdBy: id });
-    
-    if (id != job?.createdBy) {
-        throw new UnauthenticatedError("Unauthorized")
-    }
 
     if (!job) {
         throw new NotFoundError(`No job with the id ${jobId}`);
@@ -52,26 +49,48 @@ export const getJobHandler = async (req: Request, res: Response) => {
 
 export const updateJobHandler = async (req: Request, res: Response) => {
     const { body: { company, position, status }, params: { id: jobId } } = req;
-    const id = req.user?.id;
 
-    const job = await updateJob({ _id: jobId, createdBy: id }, { company, position, status });
+    const id = req.user?.id as string;
+
+    const isValidID = mongoose.isValidObjectId(jobId)
+
+    if (!isValidID) {
+        throw new BadRequestError("Please enter a correct id");
+    }
+    
+    const job = await getJob({ _id: jobId, createdBy: id });
 
     if (!job) {
         throw new NotFoundError(`No job with the id ${jobId}`);
     }
 
-    res.status(StatusCodes.OK).json({ job });
+    const updatJob = await updateJob({ _id: jobId, createdBy: id }, { company, position, status });
+
+    if (!updatJob) {
+        throw new BadRequestError("Could not update job");
+    }
+
+    res.status(StatusCodes.OK).json({ updatJob });
 };
 
 export const deleteJobHandler = async (req: Request, res: Response) => {
     const { params: { id: jobId } } = req;
+
     const id = req.user?.id;
 
-    const job = await deleteJob({ _id: jobId, createdBy: id });
+    const isValidID = mongoose.isValidObjectId(jobId)
+
+    if (!isValidID) {
+        throw new BadRequestError("Please enter a correct id");
+    }
+
+    const job = await getJob({ _id: jobId, createdBy: id });
 
     if (!job) {
         throw new NotFoundError(`No job with the id ${jobId}`);
     }
+
+     await deleteJob({ _id: jobId, createdBy: id });
 
     res.status(StatusCodes.OK).json("Job deleted successfully");
 };
